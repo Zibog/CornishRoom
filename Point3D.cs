@@ -1,4 +1,6 @@
-﻿namespace CornishRoom
+﻿using System;
+
+namespace CornishRoom
 {
     public class Point3D
     {
@@ -48,6 +50,11 @@
         public static Point3D operator /(double value, Point3D p)
         {
             return p / value;
+        }
+
+        public bool BelongsTo(Cube plane)
+        {
+            throw new NotImplementedException();
         }
     }
 }
