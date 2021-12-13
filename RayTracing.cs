@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace CornishRoom
@@ -31,6 +32,9 @@ namespace CornishRoom
             foreach (var figure in _objects)
             {
                 var distanceToFigure = Intersect(figure, from, to);
+
+                if (distanceToFigure < distance)
+                    (nearestFigure, distance) = (figure, distanceToFigure);
             }
 
             return (nearestFigure, distance);
@@ -47,8 +51,11 @@ namespace CornishRoom
 
                 if (distance < double.Epsilon)
                     return double.MaxValue;
+
+                if ((from + distance * to).BelongsTo(plane))
+                    return distance;
                 
-                
+                return double.MaxValue;
             }
             
             // TODO: sphere
