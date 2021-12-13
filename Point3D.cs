@@ -54,7 +54,11 @@ namespace CornishRoom
 
         public bool BelongsTo(Cube plane)
         {
-            throw new NotImplementedException();
+            // http://grafika.me/node/70
+            var belongsByX = X > plane.From.X + double.Epsilon && X < plane.To.X + double.Epsilon;
+            var belongsByY = Y > plane.From.Y + double.Epsilon && Y < plane.To.Y + double.Epsilon;
+            var belongsByZ = Z > plane.From.Z + double.Epsilon && Z < plane.To.Z + double.Epsilon;
+            return belongsByX && belongsByY && belongsByZ;
         }
     }
 }
