@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 
+// https://habr.com/ru/post/187720/
+// http://www.graph.unn.ru/rus/materials/CG/CG15_RayTracing.pdf
+
 namespace CornishRoom
 {
     public class RayTracing
@@ -19,7 +22,23 @@ namespace CornishRoom
 
         private Color Trace(Point3D from, Point3D to, int iteration)
         {
-            (Figure nearestFigure, double distance) = FindIntersection(from, to);
+            var (nearestFigure, distance) = FindIntersection(from, to);
+            
+            if (nearestFigure == null)
+                return Color.Black;
+
+            var intersectionPoint = from + distance * to;
+
+            Point3D normal = null;
+            if (nearestFigure.FigureType is FigureType.Cube or FigureType.Wall)
+            {
+                var cube = nearestFigure as Cube;
+                normal = cube?.Normal;
+            }
+            
+            // TODO: sphere
+
+            var intensity = Intensity(intersectionPoint, normal);
             
             return Color.Black;
         }
@@ -61,6 +80,29 @@ namespace CornishRoom
             // TODO: sphere
 
             return double.MaxValue;
+        }
+
+        private double Intensity(Point3D intersection, Point3D normal)
+        {
+            double intensity = 0;
+
+            foreach (var light in _lights)
+            {
+                var destination = light.Position - intersection;
+                var (nearestFigure, distance) = FindIntersection(intersection, destination);
+
+                // Вторым условием отсекаем случаи, когда находимся внутри сферы
+                if (nearestFigure.FigureType != FigureType.Cube && distance <= 1.0)
+                    continue;
+                
+                var lightCoefficient = Helpers.Scalar(destination, normal);
+
+                if (lightCoefficient > 0)
+                    intensity += light.Intensity * lightCoefficient /
+                                 (Helpers.Length(destination) * Helpers.Length(normal));
+            }
+            
+            return intensity;
         }
     }
 }
