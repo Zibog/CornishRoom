@@ -13,6 +13,8 @@ namespace CornishRoom
         private List<Figure> _objects;
         private List<Light> _lights;
 
+        private const byte MaxDepth = 5;
+
         public RayTracing(Point3D position, List<Figure> objects, List<Light> lights)
         {
             _position = position;
@@ -39,6 +41,12 @@ namespace CornishRoom
             // TODO: sphere
 
             var intensity = Intensity(intersectionPoint, normal);
+            var mixedColor = MixColor(nearestFigure.Color, intensity);
+
+            if (iteration == MaxDepth || nearestFigure.Material == Material.Matte)
+                return mixedColor;
+            
+            // TODO: recursion
             
             return Color.Black;
         }
@@ -59,7 +67,7 @@ namespace CornishRoom
             return (nearestFigure, distance);
         }
 
-        private double Intersect(Figure figure, Point3D from, Point3D to)
+        private static double Intersect(Figure figure, Point3D from, Point3D to)
         {
             if (figure.FigureType is FigureType.Cube or FigureType.Wall)
             {
@@ -103,6 +111,14 @@ namespace CornishRoom
             }
             
             return intensity;
+        }
+
+        private static Color MixColor(Color color, double intensity)
+        {
+            var red = Math.Min((int)(color.R * intensity), byte.MaxValue);
+            var green = Math.Min((int)(color.G * intensity), byte.MaxValue);
+            var blue = Math.Min((int)(color.B * intensity), byte.MaxValue);
+            return Color.FromArgb(red, green, blue);
         }
     }
 }
