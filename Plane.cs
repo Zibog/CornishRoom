@@ -2,13 +2,13 @@
 
 namespace CornishRoom
 {
-    public class Cube : Figure
+    public class Plane : Figure
     {
         public Point3D From { get; }
         public Point3D To { get; }
         public Point3D Normal { get; }
 
-        public Cube(FigureType type, Material material, Color color,
+        public Plane(FigureType type, Material material, Color color,
             Point3D from, Point3D to, Point3D normal)
             : base(type, material, color)
         {

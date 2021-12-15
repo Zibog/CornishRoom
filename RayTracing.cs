@@ -34,7 +34,7 @@ namespace CornishRoom
             Point3D normal = null;
             if (nearestFigure.FigureType is FigureType.Cube or FigureType.Wall)
             {
-                var cube = nearestFigure as Cube;
+                var cube = nearestFigure as Plane;
                 normal = cube?.Normal;
             }
             
@@ -71,7 +71,7 @@ namespace CornishRoom
         {
             if (figure.FigureType is FigureType.Cube or FigureType.Wall)
             {
-                var plane = figure as Cube;
+                var plane = figure as Plane;
                 var normal = Helpers.Normalize(plane.Normal);
 
                 var distance = -Helpers.Scalar(from - plane.To, normal) / Helpers.Scalar(to, normal);

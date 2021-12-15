@@ -52,7 +52,7 @@ namespace CornishRoom
             return p / value;
         }
 
-        public bool BelongsTo(Cube plane)
+        public bool BelongsTo(Plane plane)
         {
             // http://grafika.me/node/70
             var belongsByX = X > plane.From.X + double.Epsilon && X < plane.To.X + double.Epsilon;
