@@ -46,7 +46,7 @@ namespace CornishRoom
             if (iteration == MaxDepth || nearestFigure.Material == Material.Matte)
                 return mixedColor;
 
-            Color tracedColor = Color.Black;
+            Color tracedColor;
 
             if (nearestFigure.Material == Material.Reflective)
             {
@@ -170,6 +170,28 @@ namespace CornishRoom
             var sin = Math.Sqrt(Math.Max(1 - eta * eta * (1 - cos * cos), 0));
 
             return eta * normalizedRay + positiveNormal * (eta * cos - sin);
+        }
+
+        public Bitmap GetImage(int width, int height)
+        {
+            var bmp = new Bitmap(width, height);
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    var point = Convert2DTo3D(i, j, width, height);
+                    bmp.SetPixel(i, j, Trace(_position, point, MaxDepth));
+                }
+            }
+
+            return bmp;
+        }
+        
+        private static Point3D Convert2DTo3D(int x, int y, int width, int height)
+        {
+            var x3D = (x - width / 2) * (width / 100.0 / width);
+            var y3D = -(y - height / 2) * (height / 100.0 / height);
+            return new Point3D(x3D, y3D, 5);
         }
     }
 }
