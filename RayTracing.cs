@@ -9,11 +9,11 @@ namespace CornishRoom
 {
     public class RayTracing
     {
-        private Point3D _position;
-        private List<Figure> _objects;
-        private List<Light> _lights;
+        private readonly Point3D _position;
+        private readonly List<Figure> _objects;
+        private readonly List<Light> _lights;
 
-        private const byte MaxDepth = 5;
+        private const byte MaxDepth = 10;
         private const double Eps = 1E-10;
 
         public RayTracing(Point3D position, List<Figure> objects, List<Light> lights)
@@ -32,11 +32,11 @@ namespace CornishRoom
 
             var intersectionPoint = from + distance * to;
 
-            Point3D normal = null;
+            Point3D normal;
             if (nearestFigure.FigureType is FigureType.Cube or FigureType.Wall)
             {
-                var cube = nearestFigure as Plane;
-                normal = cube?.Normal;
+                var plane = nearestFigure as Plane;
+                normal = plane?.Normal;
             }
             else
             {
@@ -63,7 +63,7 @@ namespace CornishRoom
                 tracedColor = Trace(intersectionPoint, transparencyRay, ++iteration);
             }
 
-            const double ownColorCoefficient = 0.5;
+            const double ownColorCoefficient = 0.4;
 
             mixedColor = MixColorWithReflection(mixedColor, tracedColor, ownColorCoefficient);
             
@@ -88,43 +88,45 @@ namespace CornishRoom
 
         private static double Intersect(Figure figure, Point3D from, Point3D to)
         {
-            if (figure.FigureType is FigureType.Cube or FigureType.Wall)
+            switch (figure.FigureType)
             {
-                var plane = figure as Plane;
-                var normal = Helpers.Normalize(plane.Normal);
+                case FigureType.Cube or FigureType.Wall:
+                {
+                    var plane = figure as Plane;
+                    var normal = Helpers.Normalize(plane!.Normal);
 
-                var distance = -Helpers.Scalar(from - plane.To, normal) / Helpers.Scalar(to, normal);
+                    var distance = -Helpers.Scalar(@from - plane.To, normal) / Helpers.Scalar(to, normal);
 
-                if (distance < Eps)
+                    if (distance < Eps)
+                        return double.MaxValue;
+
+                    return (@from + distance * to).BelongsTo(plane) ? distance : double.MaxValue;
+                }
+                case FigureType.Sphere:
+                {
+                    var sphere = figure as Sphere;
+                    var centerToEye = @from - sphere?.Center;
+
+                    var a = Helpers.Scalar(to, to);
+                    var b = 2 * Helpers.Scalar(centerToEye, to);
+                    var c = Helpers.Scalar(centerToEye, centerToEye) - sphere!.Radius * sphere.Radius;
+
+                    var d = b * b - 4 * a * c;
+
+                    if (d < Eps)
+                        return double.MaxValue;
+
+                    var root1 = (-b + Math.Sqrt(d)) / (2 * a);
+                    var root2 = (-b - Math.Sqrt(d)) / (2 * a);
+
+                    if (Math.Max(root1, root2) < Eps)
+                        return double.MaxValue;
+
+                    return root1 < Eps ? root2 : root1;
+                }
+                default:
                     return double.MaxValue;
-
-                return (from + distance * to).BelongsTo(plane) ? distance : double.MaxValue;
             }
-            
-            if (figure.FigureType == FigureType.Sphere)
-            {
-                var sphere = figure as Sphere;
-                var centerToEye = from - sphere?.Center;
-
-                var a = Helpers.Scalar(to, to);
-                var b = 2 * Helpers.Scalar(centerToEye, to);
-                var c = Helpers.Scalar(centerToEye, centerToEye) - sphere.Radius * sphere.Radius;
-
-                var d = b * b - 4 * a * c;
-
-                if (d < Eps)
-                    return double.MaxValue;
-
-                var root1 = (-b + Math.Sqrt(d)) / (2 * a);
-                var root2 = (-b - Math.Sqrt(d)) / (2 * a);
-
-                if (Math.Max(root1, root2) < Eps)
-                    return double.MaxValue;
-
-                return root1 < Eps ? root2 : root1;
-            }
-            
-            return double.MaxValue;
         }
 
         private double Intensity(Point3D intersection, Point3D normal)
@@ -136,7 +138,7 @@ namespace CornishRoom
                 var destination = light.Position - intersection;
                 var (nearestFigure, distance) = FindIntersection(intersection, destination);
 
-                if (nearestFigure.FigureType != FigureType.Cube && distance <= 1.0)
+                if (nearestFigure.FigureType != FigureType.Wall && distance <= 1.0)
                     continue;
                 
                 var lightCoefficient = Helpers.Scalar(destination, normal);
@@ -200,7 +202,7 @@ namespace CornishRoom
             {
                 for (int j = 0; j < height; j++)
                 {
-                    var point = Convert2DTo3D(i, j, width, height);
+                    var point = ScaledPoint(i, j, width, height);
                     bmp.SetPixel(i, j, Trace(_position, point, 0));
                 }
             }
@@ -208,11 +210,11 @@ namespace CornishRoom
             return bmp;
         }
         
-        private static Point3D Convert2DTo3D(int x, int y, int width, int height)
+        private static Point3D ScaledPoint(int x, int y, int width, int height)
         {
-            var x3D = (x - width / 2) * (width / 100.0 / width);
-            var y3D = -(y - height / 2) * (height / 100.0 / height);
-            return new Point3D(x3D, y3D, 5);
+            var scaledX = (x - width / 2) * (width / 100.0 / width);
+            var scaledY = -(y - height / 2) * (height / 100.0 / height);
+            return new Point3D(scaledX, scaledY, 4);
         }
     }
 }

@@ -4,9 +4,9 @@ namespace CornishRoom
 {
     public class Point3D
     {
-        public double X { get; set; } = 0;
-        public double Y { get; set; } = 0;
-        public double Z { get; set; } = 0;
+        public double X { get; }
+        public double Y { get; }
+        public double Z { get; }
         
         private const double Eps = 1E-10;
         

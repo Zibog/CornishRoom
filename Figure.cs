@@ -12,7 +12,7 @@ namespace CornishRoom
         public Material Material { get; set; }
         public Color Color { get; set; }
 
-        public Figure(FigureType type, Material material, Color color)
+        protected Figure(FigureType type, Material material, Color color)
         {
             FigureType = type;
             Material = material;
