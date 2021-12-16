@@ -15,8 +15,11 @@ namespace CornishRoom
             _figures = new List<Figure>();
             InitRoom(25, 25, 50);
             InitCube(Material.Transparent, Color.DarkKhaki, new Point3D(-15, -21, 20), 4);
-            InitCube(Material.Matte, Color.GreenYellow, new Point3D(10, -22, 0), 3);
+            InitCube(Material.Reflective, Color.GreenYellow, new Point3D(10, -22, 0), 3);
+            InitCube(Material.Matte, Color.Red, new Point3D(0, 0, 0), 5);
             InitSphere(Material.Reflective, Color.Cornsilk, new Point3D(10, -15, 15), 10);
+            InitSphere(Material.Transparent, Color.Chartreuse, new Point3D(10, -15, 0), 3);
+            InitSphere(Material.Matte, Color.Indigo, new Point3D(-15, -10, -25), 5);
 
             var lights = new List<Light>
             {
