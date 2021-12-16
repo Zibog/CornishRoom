@@ -18,9 +18,12 @@ namespace CornishRoom
 
             _figures = new List<Figure>();
             InitRoom(25, 25, 50);
+            InitCube(Material.Reflective, Color.DarkKhaki, new Point3D(-15, -21, 20), 4);
+            InitCube(Material.Transparent, Color.GreenYellow, new Point3D(10, -22, 0), 3);
 
             var lights = new List<Light>();
             lights.Add(new Light(new Point3D(0, 0, -20), 0.7));
+            lights.Add(new Light(new Point3D(15, 20, 15), 0.3));
 
             var position = new Point3D(0, -10, -49);
 
@@ -33,17 +36,11 @@ namespace CornishRoom
 
         private void InitRoom(double x, double y, double z)
         {
-            // Задняя стена
             InitWall(Material.Matte, Color.Violet, new Point3D(-x, -y, z), new Point3D(x, y, z), new Point3D(0, 0, -1));
-            // Пол
             InitWall(Material.Matte, Color.White, new Point3D(-x, -y, -z), new Point3D(x, -y, z), new Point3D(0, 1, 0));
-            // Потолок
             InitWall(Material.Matte, Color.DarkMagenta, new Point3D(-x, y, -z), new Point3D(x, y, z), new Point3D(0, -1, 0));
-            // Левая стена
             InitWall(Material.Matte, Color.LightBlue, new Point3D(-x, -y, -z), new Point3D(-x, y, z), new Point3D(1, 0, 0));
-            // Правая стена
             InitWall(Material.Matte, Color.IndianRed, new Point3D(x, -y, -z), new Point3D(x, y, z), new Point3D(-1, 0, 0));
-            // Передняя стена
             InitWall(Material.Matte, Color.LightPink, new Point3D(-x, -y, -z), new Point3D(x, y, -z), new Point3D(0, 0, 1));
         }
         
@@ -52,10 +49,24 @@ namespace CornishRoom
             _figures.Add(new Plane(FigureType.Wall, material, color, from, to, normal));
         }
 
-        private void InitCube(Point3D center, double distanceToPlane, Material material, Color color)
+        private void InitCube(Material material, Color color, Point3D center, double distanceToPlane)
         {
             var p1 = center - distanceToPlane;
             var p2 = center + distanceToPlane;
+
+            InitPlane(material, color, new Point3D(p1.X, p1.Y, p2.Z), new Point3D(p2.X, p2.Y, p2.Z), new Point3D(0, 0, 1));
+            InitPlane(material, color, new Point3D(p1.X, p1.Y, p1.Z), new Point3D(p2.X, p2.Y, p1.Z), new Point3D(0, 0, -1));
+            
+            InitPlane(material, color, new Point3D(p1.X, p1.Y, p1.Z), new Point3D(p1.X, p2.Y, p2.Z), new Point3D(-1, 0, 0));
+            InitPlane(material, color, new Point3D(p2.X, p1.Y, p1.Z), new Point3D(p2.X, p2.Y, p2.Z), new Point3D(1, 0, 0));
+            
+            InitPlane(material, color, new Point3D(p1.X, p1.Y, p1.Z), new Point3D(p2.X, p1.Y, p2.Z), new Point3D(0, -1, 0));
+            InitPlane(material, color, new Point3D(p1.X, p2.Y, p1.Z), new Point3D(p2.X, p2.Y, p2.Z), new Point3D(0, 1, 0));
+        }
+
+        private void InitPlane(Material material, Color color, Point3D from, Point3D to, Point3D normal)
+        {
+            _figures.Add(new Plane(FigureType.Cube, material, color, from, to, normal));
         }
     }
 }
