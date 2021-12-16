@@ -51,5 +51,11 @@ namespace CornishRoom
         {
             _figures.Add(new Plane(FigureType.Wall, material, color, from, to, normal));
         }
+
+        private void InitCube(Point3D center, double distanceToPlane, Material material, Color color)
+        {
+            var p1 = center - distanceToPlane;
+            var p2 = center + distanceToPlane;
+        }
     }
 }

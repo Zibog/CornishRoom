@@ -181,7 +181,7 @@ namespace CornishRoom
                 for (int j = 0; j < height; j++)
                 {
                     var point = Convert2DTo3D(i, j, width, height);
-                    bmp.SetPixel(i, j, Trace(_position, point, MaxDepth));
+                    bmp.SetPixel(i, j, Trace(_position, point, 0));
                 }
             }
 

@@ -24,6 +24,16 @@ namespace CornishRoom
             return new Point3D(left.X + right.X, left.Y + right.Y, left.Z + right.Z);
         }
         
+        public static Point3D operator +(Point3D p, double value)
+        {
+            return new Point3D(p.X + value, p.Y + value, p.Z + value);
+        }
+        
+        public static Point3D operator +(double value, Point3D p)
+        {
+            return p + value;
+        }
+        
         public static Point3D operator -(Point3D left, Point3D right)
         {
             return left + -1 * right;
@@ -32,6 +42,11 @@ namespace CornishRoom
         public static Point3D operator -(Point3D p)
         {
             return new Point3D(-p.X, -p.Y, -p.Z);
+        }
+        
+        public static Point3D operator -(Point3D p, double value)
+        {
+            return new Point3D(p.X - value, p.Y - value, p.Z - value);
         }
 
         public static Point3D operator *(double value, Point3D right)
