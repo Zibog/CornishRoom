@@ -56,24 +56,15 @@ namespace CornishRoom
 
         public bool BelongsTo(Plane plane)
         {
-            var x = (this.X < Math.Max(plane.To.X, plane.From.X) + Eps) &&
-                    (this.X > Math.Min(plane.To.X, plane.From.X) - Eps);
-            var y = (this.Y < Math.Max(plane.To.Y, plane.From.Y) + Eps) &&
-                    (this.Y > Math.Min(plane.To.Y, plane.From.Y) - Eps);
-            var z = (this.Z < Math.Max(plane.To.Z, plane.From.Z) + Eps) &&
-                    (this.Z > Math.Min(plane.To.Z, plane.From.Z) - Eps);
-
-            return x && y && z;
             // http://grafika.me/node/70
-            var belongsByX = X > plane.From.X + Eps && X < plane.To.X + Eps;
-            var belongsByY = Y > plane.From.Y + Eps && Y < plane.To.Y + Eps;
-            var belongsByZ = Z > plane.From.Z + Eps && Z < plane.To.Z + Eps;
+            var belongsByX = X < Math.Max(plane.To.X, plane.From.X) + Eps &&
+                    X > Math.Min(plane.To.X, plane.From.X) - Eps;
+            var belongsByY = Y < Math.Max(plane.To.Y, plane.From.Y) + Eps &&
+                    Y > Math.Min(plane.To.Y, plane.From.Y) - Eps;
+            var belongsByZ = Z < Math.Max(plane.To.Z, plane.From.Z) + Eps &&
+                    Z > Math.Min(plane.To.Z, plane.From.Z) - Eps;
+
             return belongsByX && belongsByY && belongsByZ;
-            
-            return
-            X < Math.Max(plane.To.X, plane.From.X) + double.Epsilon && X > Math.Min(plane.To.X, plane.From.X) - double.Epsilon &&
-            Y < Math.Max(plane.To.Y, plane.From.Y) + double.Epsilon && Y > Math.Min(plane.To.Y, plane.From.Y) - double.Epsilon &&
-            Z < Math.Max(plane.To.Z, plane.From.Z) + double.Epsilon && Z > Math.Min(plane.To.Z, plane.From.Z) - double.Epsilon;
         }
     }
 }

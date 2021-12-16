@@ -14,7 +14,7 @@ namespace CornishRoom
         private List<Light> _lights;
 
         private const byte MaxDepth = 5;
-        private const double eps = 1E-10;
+        private const double Eps = 1E-10;
 
         public RayTracing(Point3D position, List<Figure> objects, List<Light> lights)
         {
@@ -92,42 +92,18 @@ namespace CornishRoom
 
                 var distance = -Helpers.Scalar(from - plane.To, normal) / Helpers.Scalar(to, normal);
 
-                if (distance < eps)
+                if (distance < Eps)
                     return double.MaxValue;
 
                 if ((from + distance * to).BelongsTo(plane))
                     return distance;
                 
                 return double.MaxValue;
-                
-                return PointInPlane(plane, (from + distance * to)) ? distance : double.MaxValue;
             }
             
             // TODO: sphere
 
             return double.MaxValue;
-        }
-
-        private static bool PointInPlane(Plane plain, Point3D point)
-        {
-            /*return
-                (point.X < Math.Max(plain.To.X, plain.From.X) + double.Epsilon) &&
-                (point.X > Math.Min(plain.To.X, plain.From.X) - double.Epsilon) &&
-                (point.Y < Math.Max(plain.To.Y, plain.From.Y) + double.Epsilon) &&
-                (point.Y > Math.Min(plain.To.Y, plain.From.Y) - double.Epsilon) &&
-                (point.Z < Math.Max(plain.To.Z, plain.From.Z) + double.Epsilon) &&
-                (point.Z > Math.Min(plain.To.Z, plain.From.Z) - double.Epsilon);*/
-
-            
-
-            var x = (point.X < Math.Max(plain.To.X, plain.From.X) + eps) &&
-                    (point.X > Math.Min(plain.To.X, plain.From.X) - eps);
-            var y = (point.Y < Math.Max(plain.To.Y, plain.From.Y) + eps) &&
-                    (point.Y > Math.Min(plain.To.Y, plain.From.Y) - eps);
-            var z = (point.Z < Math.Max(plain.To.Z, plain.From.Z) + eps) &&
-                    (point.Z > Math.Min(plain.To.Z, plain.From.Z) - eps);
-
-            return x && y && z;
         }
 
         private double Intensity(Point3D intersection, Point3D normal)
