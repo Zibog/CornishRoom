@@ -45,10 +45,25 @@ namespace CornishRoom
 
             if (iteration == MaxDepth || nearestFigure.Material == Material.Matte)
                 return mixedColor;
+
+            Color tracedColor = Color.Black;
+
+            if (nearestFigure.Material == Material.Reflective)
+            {
+                var reflectedRay = Helpers.Normalize(Reflect(to, normal));
+                tracedColor = Trace(intersectionPoint, reflectedRay, ++iteration);
+            }
+            else
+            {
+                var transparencyRay = Helpers.Normalize(Refract(to, normal));
+                tracedColor = Trace(intersectionPoint, transparencyRay, ++iteration);
+            }
+
+            const double ownColorCoefficient = 0.5;
+
+            mixedColor = MixColorWithReflection(mixedColor, tracedColor, ownColorCoefficient);
             
-            // TODO: recursion
-            
-            return Color.Black;
+            return mixedColor;
         }
 
         private (Figure, double) FindIntersection(Point3D from, Point3D to)
@@ -119,6 +134,42 @@ namespace CornishRoom
             var green = Math.Min((int)(color.G * intensity), byte.MaxValue);
             var blue = Math.Min((int)(color.B * intensity), byte.MaxValue);
             return Color.FromArgb(red, green, blue);
+        }
+
+        private static Color MixColorWithReflection(Color baseColor, Color reflectedColor, double ownColorCoefficient)
+        {
+            var mixedOwnColor = MixColor(baseColor, ownColorCoefficient);
+            var mixedReflectedColor = MixColor(reflectedColor, 1 - ownColorCoefficient);
+            return Color.FromArgb(
+                mixedOwnColor.R + mixedReflectedColor.R,
+                mixedOwnColor.G + mixedReflectedColor.G,
+                mixedOwnColor.B + mixedReflectedColor.B
+            );
+        }
+
+        private static Point3D Reflect(Point3D ray, Point3D normal)
+        {
+            return ray - 2 * Helpers.Scalar(ray, normal) * normal;
+        }
+
+        private static Point3D Refract(Point3D ray, Point3D normal)
+        {
+            // https://www.flipcode.com/archives/reflection_transmission.pdf
+            var positiveNormal = Helpers.Normalize(normal);
+            
+            if (Helpers.Scalar(ray, normal) > 0)
+                positiveNormal = Helpers.Normalize(-normal);
+
+            var normalizedRay = Helpers.Normalize(ray);
+
+            const double eta1 = 1.1;
+            const double eta2 = 1.0;
+            
+            var cos = -Helpers.Scalar(positiveNormal, normalizedRay);
+            var eta = cos > 0 ? eta1 / eta2 : eta2 / eta1;
+            var sin = Math.Sqrt(Math.Max(1 - eta * eta * (1 - cos * cos), 0));
+
+            return eta * normalizedRay + positiveNormal * (eta * cos - sin);
         }
     }
 }
