@@ -105,14 +105,14 @@ namespace CornishRoom
                 case FigureType.Sphere:
                 {
                     var sphere = figure as Sphere;
-                    var centerToEye = @from - sphere?.Center;
+                    var centerToEye = from - sphere!.Center;
 
                     var a = Helpers.Scalar(to, to);
                     var b = 2 * Helpers.Scalar(centerToEye, to);
-                    var c = Helpers.Scalar(centerToEye, centerToEye) - sphere!.Radius * sphere.Radius;
+                    var c = Helpers.Scalar(centerToEye, centerToEye) - sphere!.Radius * sphere!.Radius;
 
                     var d = b * b - 4 * a * c;
-
+                    
                     if (d < Eps)
                         return double.MaxValue;
 
@@ -121,8 +121,8 @@ namespace CornishRoom
 
                     if (Math.Max(root1, root2) < Eps)
                         return double.MaxValue;
-
-                    return root1 < Eps ? root2 : root1;
+                    
+                    return root1 > Eps ? root2 : root1;
                 }
                 default:
                     return double.MaxValue;
