@@ -38,8 +38,11 @@ namespace CornishRoom
                 var cube = nearestFigure as Plane;
                 normal = cube?.Normal;
             }
-            
-            // TODO: sphere
+            else
+            {
+                var sphere = nearestFigure as Sphere;
+                normal = Helpers.Normalize(intersectionPoint - sphere?.Center);
+            }
 
             var intensity = Intensity(intersectionPoint, normal);
             var mixedColor = MixColor(nearestFigure.Color, intensity);
@@ -95,14 +98,32 @@ namespace CornishRoom
                 if (distance < Eps)
                     return double.MaxValue;
 
-                if ((from + distance * to).BelongsTo(plane))
-                    return distance;
-                
-                return double.MaxValue;
+                return (from + distance * to).BelongsTo(plane) ? distance : double.MaxValue;
             }
             
-            // TODO: sphere
+            if (figure.FigureType == FigureType.Sphere)
+            {
+                var sphere = figure as Sphere;
+                var centerToEye = from - sphere?.Center;
 
+                var a = Helpers.Scalar(to, to);
+                var b = 2 * Helpers.Scalar(centerToEye, to);
+                var c = Helpers.Scalar(centerToEye, centerToEye) - sphere.Radius * sphere.Radius;
+
+                var d = b * b - 4 * a * c;
+
+                if (d < Eps)
+                    return double.MaxValue;
+
+                var root1 = (-b + Math.Sqrt(d)) / (2 * a);
+                var root2 = (-b - Math.Sqrt(d)) / (2 * a);
+
+                if (Math.Max(root1, root2) < Eps)
+                    return double.MaxValue;
+
+                return root1 < Eps ? root2 : root1;
+            }
+            
             return double.MaxValue;
         }
 
@@ -115,7 +136,6 @@ namespace CornishRoom
                 var destination = light.Position - intersection;
                 var (nearestFigure, distance) = FindIntersection(intersection, destination);
 
-                // Вторым условием отсекаем случаи, когда находимся внутри сферы
                 if (nearestFigure.FigureType != FigureType.Cube && distance <= 1.0)
                     continue;
                 
